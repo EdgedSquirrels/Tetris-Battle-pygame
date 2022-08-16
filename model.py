@@ -3,6 +3,7 @@ import pygame as pg
 import time
 from eventmanager import *
 from random import shuffle, randint
+from buttons import *
 
 
 def is_number(s):
@@ -12,111 +13,6 @@ def is_number(s):
         return True
     except ValueError:
         return False
-
-
-class BaseButton:
-    """
-    BaseButton with basic fuctionalities.
-    """
-
-    def __init__(self, evManager):
-        self.evManager = evManager
-        self.onClick = None
-        self.width, self.height = 128, 37
-        self.left, self.top = 168, 347
-        self.border = 3
-        self.color = (40, 140, 230)
-        self.font = pg.font.Font("src/KRKZ.ttf", 20)
-        self.isVisible = True
-        self.isHover = False
-        self.text = ["Button", "Button2", "Button3"]
-        self.border_radius = 10
-        self.textIndex = 0
-
-    def get_rect(self):
-        return pg.Rect(self.left, self.top, self.width, self.height)
-
-    def click(self):
-        if self.onClick != None:
-            self.evManager.Post(self.onClick)
-        elif type(self.text) == list:
-            self.textIndex = (self.textIndex + 1) % len(self.text)
-
-    def draw(self, screen):
-        surface = pg.Surface((self.width, self.height), pg.SRCALPHA)
-        surface.fill((0, 0, 0, 0))
-
-        # render border
-        pg.draw.rect(
-            surface,
-            (255, 255, 255),
-            pg.Rect(0, 0, self.width, self.height),
-            border_radius=self.border_radius,
-        )
-
-        # render button
-        color = self.color
-        if self.isHover:
-            color = tuple(min(x + 50, 255) for x in color)  # make the button brighter
-        pg.draw.rect(
-            surface,
-            color,
-            pg.Rect(
-                self.border,
-                self.border,
-                self.width - self.border * 2,
-                self.height - self.border * 2,
-            ),
-            border_radius=self.border_radius - self.border,
-        )
-
-        # render message
-        msg = self.text[self.textIndex] if type(self.text) == list else self.text
-        surface.blit(
-            self.font.render(msg, True, (255, 255, 255)),
-            (self.border + self.border_radius, self.border * 2),
-        )
-
-        screen.blit(surface, (self.left, self.top))
-
-
-class StartButton(BaseButton):
-    def __init__(self, evManager):
-        super().__init__(evManager)
-        self.evManager = evManager
-        self.onClick = StateChangeEvent(const.STATE_COUNTDOWN)
-        self.text = "Start"
-        self.width, self.height = (163, 63)
-        self.left, self.top = (148, 268)
-        self.border = 5
-        self.color = (75, 200, 0)
-        self.font = pg.font.Font("src/KRKZ.ttf", 38)
-        self.border_radius = 15
-
-
-class PlayerNumButton(BaseButton):
-    def __init__(self, evManager):
-        super().__init__(evManager)
-        self.evManager = evManager
-        self.text = ["Player: 1", "Player: 2"]
-
-    def click(self):
-        self.textIndex = (self.textIndex + 1) % len(self.text)
-        self.evManager.Post(PlayerNumberChangeEvent(self.textIndex + 1))
-
-
-class PlayerModeButton(BaseButton):
-    def __init__(self, evManager, id=0, isVisible=False):
-        super().__init__(evManager)
-        self.id = id
-        self.left, self.top = 152, 397 + id * 50
-        self.width = 160
-        self.text = ["P%d:keyboard" % (id + 1), "P%d:log" % (id + 1)]
-        self.isVisible = isVisible
-
-    def click(self):
-        self.textIndex = (self.textIndex + 1) % len(self.text)
-
 
 class Logger:
     """
@@ -362,6 +258,35 @@ class Player:
         self.n_garbages_from = self.n_garbages_to
         self.n_garbages_to += n_garbage
 
+    def _getTspin_Type(self):
+        ypos, xpos = self.ghost_position
+        n_occupy, Tspin_type = 0, 0
+        if (
+            self.is_last_move_rotate
+            and const.TETRIMINO_CODES[self.current_piece] == "T"
+        ):
+            not_fill = (0, 0)  # record which block is not filled
+            for dx, dy in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
+                x, y = xpos + dx, ypos + dy
+                if x < 0 or x >= const.BOARD_WIDTH or y < 0 or self.board[y][x]:
+                    n_occupy += 1
+                else:
+                    not_fill = (dx, dy)
+            if n_occupy >= 3:
+                Tspin_type = 2
+                if (
+                    not_fill == (-1, -1)
+                    and self.current_rotation in [2, 3]
+                    or not_fill == (-1, 1)
+                    and self.current_rotation in [3, 0]
+                    or not_fill == (1, 1)
+                    and self.current_rotation in [0, 1]
+                    or not_fill == (1, -1)
+                    and self.current_rotation in [1, 2]
+                ):
+                    Tspin_type = 1
+        return Tspin_type
+
     def drop(self, addToBag=[]):
         """
         Hard-Drop the current falling tetrimino.
@@ -390,34 +315,7 @@ class Player:
                     self.garbages.pop(0)
 
         # handle T-spin
-        Tspin_type = 0  # [None, T-spin-mini, T-spin]
-
-        n_occupy = 0
-        if (
-            self.is_last_move_rotate
-            and const.TETRIMINO_CODES[self.current_piece] == "T"
-        ):
-            not_fill = (0, 0)  # record which block is not filled
-            for dx, dy in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
-                x, y = xpos + dx, ypos + dy
-                if x < 0 or x >= const.BOARD_WIDTH or y < 0 or self.board[y][x]:
-                    n_occupy += 1
-                else:
-                    not_fill = (dx, dy)
-            if n_occupy >= 3:
-                Tspin_type = 2
-                if (
-                    not_fill == (-1, -1)
-                    and self.current_rotation in [2, 3]
-                    or not_fill == (-1, 1)
-                    and self.current_rotation in [3, 0]
-                    or not_fill == (1, 1)
-                    and self.current_rotation in [0, 1]
-                    or not_fill == (1, -1)
-                    and self.current_rotation in [1, 2]
-                ):
-                    Tspin_type = 1
-
+        Tspin_type = self._getTspin_Type  # [None, T-spin-mini, T-spin]
         lines, isClear = self._clearLines()
 
         if self.id == 0 and lines:

@@ -82,6 +82,4 @@ class InputDevices(object):
                     self.lastKeyDuration = 0
                     for key in [pg.K_LEFT, pg.K_RIGHT, pg.K_DOWN]:
                         if keys[key]:
-                            # print(key)
                             self.lastKey = key
-                            # print(key, self.lastKey)
