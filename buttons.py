@@ -2,6 +2,7 @@ import const
 import pygame as pg
 from eventmanager import *
 
+
 class BaseButton:
     """
     BaseButton with basic fuctionalities.

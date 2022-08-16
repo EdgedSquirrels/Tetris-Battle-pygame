@@ -14,6 +14,7 @@ def is_number(s):
     except ValueError:
         return False
 
+
 class Logger:
     """
     Handles log I/O for files
@@ -315,7 +316,7 @@ class Player:
                     self.garbages.pop(0)
 
         # handle T-spin
-        Tspin_type = self._getTspin_Type  # [None, T-spin-mini, T-spin]
+        Tspin_type = self._getTspin_Type()  # [None, T-spin-mini, T-spin]
         lines, isClear = self._clearLines()
 
         if self.id == 0 and lines:
@@ -474,6 +475,9 @@ class GameEngine(object):
                     button.isVisible = True if self.n_players > button.id else False
 
         elif isinstance(event, StateChangeEvent):
+            if event.cur_event == const.STATE_ENDGAME:
+                self.winner_id = event.winner
+                self.loser_id = event.loser
             self._handleStateChangeEvent(event.cur_event)
 
         elif isinstance(event, PlayerMoveEvent):
@@ -561,73 +565,65 @@ class GameEngine(object):
             self.players[event.to_id].receiveGarbage(event.n_garbage)
 
     def _handleStateChangeEvent(self, cur_state):
+        if cur_state == const.STATE_MENU:
+            for button in self.buttons:
+                button.isHover = False
 
-            if cur_state == const.STATE_MENU:
-                for button in self.buttons:
-                    button.isHover = False
+        elif cur_state == const.STATE_COUNTDOWN:
+            self.evManager.Post(PlaySoundEvent("countDown"))
+            modes = [0, 0]
+            for button in self.buttons:
+                if isinstance(button, PlayerNumButton):
+                    self.n_players = button.textIndex + 1
+                elif isinstance(button, PlayerModeButton):
+                    modes[button.id] = button.textIndex
 
-            elif cur_state == const.STATE_COUNTDOWN:
-                self.evManager.Post(PlaySoundEvent("countDown"))
-                modes = [0, 0]
-                for button in self.buttons:
-                    if isinstance(button, PlayerNumButton):
-                        self.n_players = button.textIndex + 1
-                    elif isinstance(button, PlayerModeButton):
-                        modes[button.id] = button.textIndex
+            self.players = [
+                Player(i, self.evManager, self.n_players, mode=modes[i])
+                for i in range(self.n_players)
+            ]
 
-                self.players = [
-                    Player(i, self.evManager, self.n_players, mode=modes[i])
-                    for i in range(self.n_players)
-                ]
+        elif cur_state == const.STATE_PLAY:
+            self.evManager.Post(PlaySoundEvent("main"))
+            for player in self.players:
+                player.game_timer = pg.time.get_ticks()
 
-            elif cur_state == const.STATE_PLAY:
-                self.evManager.Post(PlaySoundEvent("main"))
-                for player in self.players:
-                    player.game_timer = pg.time.get_ticks()
+        elif cur_state == const.STATE_TIMEUP:
+            self.evManager.Post(PlaySoundEvent("timeup"))
 
-            elif cur_state == const.STATE_TIMEUP:
-                self.evManager.Post(PlaySoundEvent("timeup"))
-
-            elif cur_state == const.STATE_ENDGAME:
-                # decide the winner and loser
-                self.winner_id = event.winner
-                self.loser_id = event.loser
-                if self.winner_id != None:
-                    self.loser_id = (
-                        None
-                        if self.n_players != 2
-                        else self.n_players - 1 - self.winner_id
-                    )
-                elif self.loser_id != None:
-                    self.winner_id = (
-                        None
-                        if self.n_players != 2
-                        else self.n_players - 1 - self.loser_id
-                    )
-                elif self.n_players == 2:
-                    pt = [self.players[0].KO, self.players[1].KO]
-                    if pt[0] == pt[1]:
-                        pt = [self.players[0].score, self.players[1].score]
-                        if pt[0] == pt[1]:
-                            for id, player in enumerate(self.players):
-                                pt[id] = -len(player.garbages)
-                                board = player.board
-                                for y in range(const.BOARD_HEIGHT):
-                                    if sum(board[y]) > 0:
-                                        pt[id] = -y - 1 - len(player.garbages)
-                    if pt[0] >= pt[1]:
-                        self.winner_id, self.loser_id = 0, 1
-                    else:
-                        self.winner_id, self.loser_id = 1, 0
-                else:
-                    self.winner_id = 0
-                self.evManager.Post(
-                    PlaySoundEvent("win" if self.winner_id == 0 else "lose")
+        elif cur_state == const.STATE_ENDGAME:
+            # decide the winner and loser
+            if self.winner_id != None:
+                self.loser_id = (
+                    None if self.n_players != 2 else self.n_players - 1 - self.winner_id
                 )
+            elif self.loser_id != None:
+                self.winner_id = (
+                    None if self.n_players != 2 else self.n_players - 1 - self.loser_id
+                )
+            elif self.n_players == 2:
+                pt = [self.players[0].KO, self.players[1].KO]
+                if pt[0] == pt[1]:
+                    pt = [self.players[0].score, self.players[1].score]
+                    if pt[0] == pt[1]:
+                        for id, player in enumerate(self.players):
+                            pt[id] = -len(player.garbages)
+                            board = player.board
+                            for y in range(const.BOARD_HEIGHT):
+                                if sum(board[y]) > 0:
+                                    pt[id] = -y - 1 - len(player.garbages)
+                if pt[0] >= pt[1]:
+                    self.winner_id, self.loser_id = 0, 1
+                else:
+                    self.winner_id, self.loser_id = 1, 0
+            else:
+                self.winner_id = 0
+            self.evManager.Post(
+                PlaySoundEvent("win" if self.winner_id == 0 else "lose")
+            )
 
-            self.game_timer = pg.time.get_ticks()
-            self.cur_state = event.cur_event
-        
+        self.game_timer = pg.time.get_ticks()
+        self.cur_state = cur_state
 
     def run(self):
         """
