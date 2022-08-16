@@ -12,7 +12,7 @@ python main.py
 ```
 Enjoy and have fun :slightly_smiling_face:
 ## Introduction
-[Tetris Battle](https://tetris.fandom.com/wiki/Tetris_Battle) was a well-known online tetris game on Facebook. But due to its closure in 2019, the game is no longer available in Facebook. As an aficionado of this game, I re-made the [game](https://github.com/EdgedSquirrels/Tetris-Battle) in C++ with [SFML](https://www.sfml-dev.org/). However, setting up the SFML environment may be hard for beginners. Therefore, I made a pygame version based on [mvc-game-design](https://github.com/wesleywerner/mvc-game-design), and it will make installation easier. Also, the framework is redesigned for better readibility and maintenance.
+[Tetris Battle](https://tetris.fandom.com/wiki/Tetris_Battle) was a well-known online tetris game on Facebook. But due to its closure in 2019, the game is no longer available in Facebook. A fan re-made the [game](https://github.com/EdgedSquirrels/Tetris-Battle) in C++ with [SFML](https://www.sfml-dev.org/). However, setting up the SFML environment may be hard for beginners. Therefore, I made a pygame version based on [mvc-game-design](https://github.com/wesleywerner/mvc-game-design), and it will make installation easier. Also, the framework is redesigned for better readibility and maintenance.
 
 ## Game Mechanism
 Most of the implementation follows [Tetris Guideline](https://tetris.fandom.com/wiki/Tetris_Guideline). And this implementation supports Super Rotation System/Standard Rotation System ([SRS](https://tetris.fandom.com/wiki/SRS)) as well.
