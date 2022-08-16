@@ -265,8 +265,7 @@ class Player:
         # Update tactic
         if lines or Tspin_type:
             self.tactic_timer = pg.time.get_ticks()
-            if lines:
-                self.tactic = ["", "SINGLE", "DOUBLE", "TRIPLE", "TETRIS"][lines]
+            self.tactic = ["", "SINGLE", "DOUBLE", "TRIPLE", "TETRIS"][lines]
             if isClear:
                 self.tactic = "Perfect Clear"
             self.tactic_Tspin = Tspin_type > 0

@@ -38,7 +38,7 @@ class Logger:
             line = self.inFile.readline()
             self.writeLog(line[:-1])
             line = list(map(int, line.split()))
-            print("handling:", line)
+            # print("handling:", line)
             player.initBag(line)
 
     def writeLog(self, data: str):

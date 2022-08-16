@@ -120,15 +120,6 @@ class GraphicalView(object):
             surface = pg.Surface((23 * const.BOARD_WIDTH, 23 * 20 + 3), pg.SRCALPHA)
             surface.fill((255, 255, 255, 0))
 
-            # render Board
-            for y in range(const.BOARD_HEIGHT_VISIBLE):
-                for x in range(const.BOARD_WIDTH):
-                    if board[y][x]:
-                        surface.blit(
-                            tilesImg[board[y][x]],
-                            (23 * x, (19 - (y + len(player.garbages))) * 23 + 3),
-                        )
-
             # render Garbage Lines
             for i, _x in enumerate(player.garbages):
                 y = len(player.garbages) - i - 1
@@ -160,6 +151,15 @@ class GraphicalView(object):
                     tilesImg[piece],
                     (23 * x, (19 - (y + len(player.garbages))) * 23 + 3),
                 )
+            
+            # render Board
+            for y in range(const.BOARD_HEIGHT_VISIBLE):
+                for x in range(const.BOARD_WIDTH):
+                    if board[y][x]:
+                        surface.blit(
+                            tilesImg[board[y][x]],
+                            (23 * x, (19 - (y + len(player.garbages))) * 23 + 3),
+                        )
 
             # render Combo
             if player.combo_timer != None:
