@@ -2,7 +2,7 @@ import const
 import pygame as pg
 from random import shuffle, randint
 from eventmanager import *
-from logger import *
+from components.logger import *
 
 
 class Player:

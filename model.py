@@ -1,8 +1,8 @@
 import const
 import pygame as pg
 from eventmanager import *
-from buttons import *
-from player import *
+from components.buttons import *
+from components.player import *
 
 
 class GameEngine(object):

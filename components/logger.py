@@ -26,8 +26,8 @@ class Logger:
         self.player = player
 
         # open outFile
-        time_str = time.strftime("%y-%m-%d-%H-%M-%S", time.localtime())
-        self.outFile = open("log/log-%dP-%s.txt" % (player.id + 1, time_str), "w")
+        time_str = time.strftime("20%y-%m-%d %H-%M-%S", time.localtime())
+        self.outFile = open("log/log %s %dP.txt" % (time_str, player.id + 1), "w")
 
         # open log file
         if player.mode == const.MODE_LOG:
