@@ -1,11 +1,13 @@
 # Tetris-Battle-pygame
  ![Python](https://img.shields.io/badge/python-3670A0?style=flat-square&logo=python&logoColor=ffdd54) ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square) ![MIT badge](https://img.shields.io/github/license/EdgedSquirrels/Tetris-Battle-pygame?style=flat-square) ![CodeFactor](https://www.codefactor.io/repository/github/edgedsquirrels/tetris-battle-pygame/badge?style=flat-square)
+ 
+ ![](https://i.imgur.com/xEjrVIU.png)
 ## Installation
 ```bash
-pip3 install pygame
-git clone ...
-cd ...
-python3 main.py
+pip install pygame
+git clone https://github.com/EdgedSquirrels/Tetris-Battle-pygame.git
+cd Tetris-Battle-pygame
+python main.py
 ```
 Enjoy and have fun :slightly_smiling_face:
 ## Introduction
