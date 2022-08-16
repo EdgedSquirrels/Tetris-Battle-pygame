@@ -45,7 +45,7 @@ class Player:
         self.KOed = 0
 
         self.tactic = ""
-        self.tactic_Tspin = 0
+        self.tactic_Tspin = False
 
         # timer properties
         self.game_timer = None
@@ -230,7 +230,7 @@ class Player:
                     self.garbages.pop(0)
 
         # handle T-spin
-        Tspin_type = self._getTspin_Type()  # [None, T-spin-mini, T-spin]
+        Tspin_type = self._getTspin_Type()
         lines, isClear = self._clearLines()
 
         if self.id == 0 and lines:
@@ -269,7 +269,9 @@ class Player:
                 self.tactic = ["", "SINGLE", "DOUBLE", "TRIPLE", "TETRIS"][lines]
             if isClear:
                 self.tactic = "Perfect Clear"
-            self.tactic_Tspin = Tspin_type
+            self.tactic_Tspin = Tspin_type > 0
+            if Tspin_type == 1 and lines == 1:
+                self.tactic = "MINI"
 
         # Update scoring properties
         self.B2B = True if lines == 4 or Tspin_type else False

@@ -275,9 +275,8 @@ class GraphicalView(object):
                         (378 + 484 * id, 585),
                     )
                     if player.tactic_Tspin:
-                        msg = "T-spin" if player.tactic_Tspin == 2 else "T-spin mini"
                         self.screen.blit(
-                            self.smallfont.render(msg, True, color),
+                            self.smallfont.render("T-spin", True, color),
                             (378 + 484 * id, 567),
                         )
 
