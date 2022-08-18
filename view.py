@@ -167,7 +167,7 @@ class GraphicalView(object):
                 if prog == 1:
                     player.combo_timer = None
                 else:
-                    img = comboImg[player.combo].copy()
+                    img = comboImg[min(player.combo, const.MAX_COMBO)].copy()
                     img.set_alpha(int(255 * (1 - prog)))
                     surface.blit(img, (46, 161))
 
