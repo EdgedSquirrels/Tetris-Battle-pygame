@@ -125,8 +125,9 @@ class GameEngine(object):
         elif isinstance(event, KOEvent):
             KOed_id, KOget_id = event.KOed_id, event.KOget_id
             self.players[KOget_id].KO += 1
-            self.players[KOed_id].KOed_timer = pg.time.get_ticks()
-            if KOed_id == 0:
+            if self.players[KOget_id].KO == const.MAX_KO:
+                self.evManager.Post(StateChangeEvent(const.STATE_ENDGAME, winner=KOget_id))
+            elif KOed_id == 0:
                 self.evManager.Post(PlaySoundEvent("KOed"))
             elif KOget_id == 0:
                 self.evManager.Post(PlaySoundEvent("KOget"))

@@ -105,6 +105,7 @@ class Player:
             y = y - garbage_height
         elif garbage_height > 0:
             self.KOed += 1
+            self.KOed_timer = pg.time.get_ticks()
             self.evManager.Post(KOEvent(self.id, self.opp_id))
             return
         else:

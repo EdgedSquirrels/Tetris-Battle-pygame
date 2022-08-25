@@ -49,10 +49,10 @@ class Logger:
 
     def tickLog(self):
         """
-        Given the timeClock, check whether the logger should take any action
+        Check whether the logger should take any action
         """
         time_clk = (
-            pg.time.get_ticks() - self.player.game_timer - self.player.KOed * 1000
+            pg.time.get_ticks() - self.player.game_timer
         )
         if self.player.mode == const.MODE_LOG:
             while True:
