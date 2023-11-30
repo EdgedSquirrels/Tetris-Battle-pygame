@@ -1,0 +1,28 @@
+name: Build Tetris with Pygbag
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-pygbag:
+    name: Tetris Game - Pygame
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Deployment
+      run: |
+            echo "Attempting to install pygbag"
+            python -m pip install pygbag
+            echo "Successfully installed pygbag"
+            echo "Attempting to build the game"
+            python -m pygbag --build $GITHUB_WORKSPACE/main.py
+            echo "Successfully build the game and complied to WebAssembly"
+
+    - name : "Upload to GitHub pages branch gh-pages"
+      uses: JamesIves/github-pages-deploy-action@v4.4.1
+      with:
+        branch: gh-pages
+        folder: build/web/archives
